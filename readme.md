@@ -3,8 +3,7 @@ FaizPay PHP Payment SDK
 SDK for working with FaizPay payment APIs.
 
 __New Payment__
-```
-<?php
+```php
 use FaizPay\PaymentSDK\Connection;
 use FaizPay\PaymentSDK\Payment;
 
@@ -25,8 +24,7 @@ $url = $payment->process($redirectBrowser  = false);
 
 __Notification Handling__
 
-```
-<?php
+```php
 use FaizPay\PaymentSDK\Connection;
 use FaizPay\PaymentSDK\NotificationHandler;
 
@@ -62,8 +60,7 @@ $db->update("UPDATE orders completed=1, external_id=?, net_amount=? WHERE id = ?
 
 __User or Pre Selected Provider For New Payment__
 
-```
-<?php
+```php
 use FaizPay\PaymentSDK\Provider;
 use FaizPay\PaymentSDK\User;
 
