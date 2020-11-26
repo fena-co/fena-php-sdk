@@ -4,10 +4,11 @@
     "type": "library",
     "authors": [
         {
-            "name": "Faiz Rasool",
-            "email": "faiz@faizpay.com"
+            "name": "FaizPay",
+            "email": "support@faizpay.com"
         }
     ],
+    "license": "MIT",
     "require": {
         "firebase/php-jwt": "^5.2",
         "ext-json": "*"
