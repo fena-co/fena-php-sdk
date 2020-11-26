@@ -7,11 +7,14 @@ __New Payment__
 use FaizPay\PaymentSDK\Connection;
 use FaizPay\PaymentSDK\Payment;
 
-$connection = new Connection($terminalId ='8afa74ae-6ef9-48bb-93b2-9fe8be53db50', $terminalSecret='55d7d5ed-be22-4321-bb3f-aec8524d8be2');
+$connection = new Connection(
+                    $terminalId = '8afa74ae-6ef9-48bb-93b2-9fe8be53db50',
+                    $terminalSecret = '55d7d5ed-be22-4321-bb3f-aec8524d8be2'
+);
 
 $payment = new Payment(
     $connection,
-    $orderId ='AA-11', 
+    $orderId = 'AA-11', 
     $amount = '10.00'
 );
  
@@ -58,7 +61,7 @@ if (!$notificationHandler->validatePayment($data['amount'])) {
 $db->update("UPDATE orders completed=1, external_id=?, net_amount=? WHERE id = ?", [$notificationHandler->getId(), $notificationHandler->getNetAmount(), $orderId]);
 ```
 
-__User or Pre Selected Provider For New Payment__
+__Set User or Pre Selected Provider For New Payment__
 
 ```php
 use FaizPay\PaymentSDK\Provider;
