@@ -47,9 +47,13 @@ class Provider
 
     /**
      * @param string|null $sortCode
+     * @throws \Exception
      */
     public function setSortCode($sortCode)
     {
+        if ($sortCode != '' && strlen(trim($sortCode)) != '6') {
+            throw new \Exception('Invalid Sort Code');
+        }
         $this->sortCode = trim($sortCode);
     }
 
@@ -63,9 +67,13 @@ class Provider
 
     /**
      * @param string|null $accountNumber
+     * @throws \Exception
      */
     public function setAccountNumber($accountNumber)
     {
+        if ($accountNumber != '' && strlen(trim($accountNumber)) != '8') {
+            throw new \Exception('Invalid Account Number');
+        }
         $this->accountNumber = trim($accountNumber);
     }
 }
