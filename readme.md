@@ -2,6 +2,16 @@ FaizPay PHP Payment SDK
 =======
 SDK for working with FaizPay payment APIs.
 
+
+Installation
+------------
+
+Use composer to manage your dependencies and download FaizPay PHP Payment SDK:
+
+```bash
+composer require faizpay/php-payment-sdk
+```
+
 __New Payment__
 ```php
 use FaizPay\PaymentSDK\Connection;
