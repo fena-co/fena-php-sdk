@@ -94,3 +94,28 @@ $provider->setAccountNumber('12345678');
 // payment object
 $payment->setProvider($provider);
 ```
+
+__Validate UK Account Number And Sort Number__
+1. This tools checks if the given sort code and account number is valid
+and enabled for faster payment network.
+
+```php
+use \FaizPay\PaymentSDK\Connection;
+use \FaizPay\PaymentSDK\Tools\VerifyUKAccount;
+$connection = new Connection($terminalId, $terminalSecret);
+
+$test = new VerifyUKAccount($connection);
+
+# invalid code
+
+$result = $test->verify($sortCode = '938063', $accountNumber = '15764273');
+
+print_r($result);
+
+Array
+(
+    [type] => success
+    [result] => false
+)
+
+```
