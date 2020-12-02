@@ -102,12 +102,9 @@ and enabled for faster payment network.
 ```php
 use \FaizPay\PaymentSDK\Connection;
 use \FaizPay\PaymentSDK\Tools\VerifyUKAccount;
+
 $connection = new Connection($terminalId, $terminalSecret);
-
 $test = new VerifyUKAccount($connection);
-
-# invalid code
-
 $result = $test->verify($sortCode = '938063', $accountNumber = '15764273');
 
 print_r($result);
