@@ -46,11 +46,7 @@ $payment = Payment::createPayment(
     $amount = '10.00'
 );
  
-$payment->process($redirectBrowser  = true);
-
-// OR
-
-$url = $payment->process($redirectBrowser  = false);
+$payment->process();
 ```
 
 __Webhook / Notification Handling__
