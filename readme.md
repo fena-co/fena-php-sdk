@@ -2,17 +2,35 @@ FaizPay PHP Payment SDK
 =======
 SDK for working with FaizPay payment APIs.
 
+Requirements
+------------
+PHP 7.0.0 and later.
 
 Installation
 ------------
 
-Use composer to manage your dependencies and download FaizPay PHP Payment SDK:
+You can install the bindings via Composer. Run the following command:
 
 ```bash
 composer require faizpay/php-payment-sdk
 ```
 
-__New Payment__
+To use the bindings, use Composer's autoload:
+
+```php
+require_once('vendor/autoload.php');
+```
+
+Dependencies
+------------
+-   [`json`](https://secure.php.net/manual/en/book.json.php)
+-   [`mbstring`](https://secure.php.net/manual/en/book.mbstring.php) (Multibyte String)
+
+
+Getting Started
+------------
+Simple new payment looks like:
+
 ```php
 use FaizPay\PaymentSDK\Connection;
 use FaizPay\PaymentSDK\Payment;
@@ -35,7 +53,7 @@ $payment->process($redirectBrowser  = true);
 $url = $payment->process($redirectBrowser  = false);
 ```
 
-__Notification Handling__
+__Webhook / Notification Handling__
 
 ```php
 use FaizPay\PaymentSDK\Connection;
@@ -66,7 +84,7 @@ if (!$notificationHandler->validateAmount($data['amount'])) {
 updateDatabase($orderId, ['completed' => true]);
 ```
 
-__Set User or Pre Selected Provider For New Payment__
+__Optional: Set User or Pre Selected Provider For New Payment__
 
 ```php
 use FaizPay\PaymentSDK\Connection;
@@ -87,9 +105,6 @@ $user = User::createUser(
     $lastName = 'Doe',
     $contactNumber = '07000845953'
 );
-$payment->setUser($user);
-
-// payment object
 $payment->setUser($user);
 
 $provider = Provider::createProvider(
