@@ -18,40 +18,65 @@ class Payment
     protected $user;
     protected $provider;
 
+
+    /**
+     * @param Connection $connection
+     * @param string $orderId client order id
+     * @param string $amount amount in 2 decimal places
+     * @return Error|Payment
+     */
+    public static function createPayment(
+        Connection $connection,
+        string $orderId,
+        string $amount
+    )
+    {
+        $orderId = trim($orderId);
+        // validate order Id
+        if ($orderId == '') {
+            return new Error(Errors::CODE_3);
+        }
+        // validate amount
+        if ($amount == '' || $amount == '0.00' || (float)$amount < 0) {
+            return new Error(Errors::CODE_4);
+        }
+
+        // validate amount
+        if (!NumberFormatter::validateTwoDecimals($amount)) {
+            return new Error(Errors::CODE_5);
+        }
+
+        // validate order is greater than 255
+        if (strlen($orderId) > 255) {
+            return new Error(Errors::CODE_6);
+        }
+
+        return new Payment($connection, $orderId, $amount);
+    }
+
     /**
      * Payment constructor.
      * @param Connection $connection
      * @param $orderId string unique order id
      * @param $amount  string amount requested
-     * @throws \Exception
      */
-    public function __construct(
+    private function __construct(
         Connection $connection,
-        $orderId,
-        $amount
+        string $orderId,
+        string $amount
     )
     {
         $this->connection = $connection;
         $this->orderId = $orderId;
-        $this->amount = NumberFormatter::formatNumber($amount);
-
-        // validate order Id
-        if ($this->orderId == '') {
-            throw new \Exception('Order ID cannot be empty');
-        }
-
-        // validate amount
-        if ($this->amount == '' || $this->amount == '0.00') {
-            throw new \Exception('Invalid Amount');
-        }
+        $this->amount = $amount;
     }
 
     /**
      * Set the optional user for payment
-     * @param User $user
+     * @param User|null $user
      * @return $this
      */
-    public function setUser(User $user)
+    public function setUser(?User $user): Payment
     {
         $this->user = $user;
         return $this;
@@ -59,10 +84,10 @@ class Payment
 
     /**
      * Set the optional provider for payment
-     * @param Provider $provider
+     * @param Provider|null $provider
      * @return $this
      */
-    public function setProvider(Provider $provider)
+    public function setProvider(?Provider $provider): Payment
     {
         $this->provider = $provider;
         return $this;
@@ -71,8 +96,7 @@ class Payment
     /**
      * process the payment
      * @param false $redirectBrowser
-     * @return string
-     * @throws \Exception
+     * @return Error|string
      */
     public function process($redirectBrowser = false)
     {
@@ -97,13 +121,7 @@ class Payment
             $payload['sortCode'] = (string)$this->provider->getSortCode();
             $payload['accountNumber'] = (string)$this->provider->getAccountNumber();
         }
-
-        try {
-            $jwt = JWT::encode($payload, $this->connection->getTerminalSecret(), $this->alg);
-        } catch (\Exception  $exception) {
-            throw new \Exception('Unable to generate a singed token' . $exception);
-        }
-
+        $jwt = JWT::encode($payload, $this->connection->getTerminalSecret(), $this->alg);
         $url = $this->endpoint . $jwt;
 
         if ($redirectBrowser) {

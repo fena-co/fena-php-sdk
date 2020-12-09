@@ -1,49 +1,71 @@
 <?php
 
-
 namespace FaizPay\PaymentSDK;
-
 
 use FaizPay\PaymentSDK\Helper\NumberFormatter;
 use Firebase\JWT\JWT;
 
 class NotificationHandler
 {
-    private $alg = "HS512";
+    private static $alg = "HS512";
     protected $connection;
     protected $token;
+
+    public static function createNotificationHandler(Connection $connection, $token)
+    {
+        try {
+            $token = JWT::decode($token, $connection->getTerminalSecret(), [self::$alg]);
+            if ($token instanceof \stdClass) {
+                $token = json_decode(json_encode($token), true);
+            }
+        } catch (\Exception $exception) {
+            return new Error(Errors::CODE_16);
+        }
+
+
+        // verify if token has field
+        if (!is_array($token) ||
+            !isset($token['id']) ||
+            !isset($token['orderID']) ||
+            !isset($token['requestAmount']) ||
+            !isset($token['netAmount']) ||
+            !isset($token['terminal'])
+        ) {
+            return new Error(Errors::CODE_17);
+        }
+
+        // validate the terminal
+        if ($token['terminal'] != $connection->getTerminalId()) {
+            return new Error(Errors::CODE_18);
+        }
+
+        return new NotificationHandler($connection, $token);
+    }
 
     /**
      * NotificationHandler constructor.
      * @param Connection $connection
      * @param $token
      */
-    public function __construct(Connection $connection, $token)
+    private function __construct(Connection $connection, $token)
     {
         $this->connection = $connection;
-        try {
-            $token = JWT::decode($token, $this->connection->getTerminalSecret(), [$this->alg]);
-            if ($token instanceof \stdClass) {
-                $this->token = json_decode(json_encode($token), true);
-            }
-        } catch (\Exception $exception) {
-
-        }
+        $this->token = $token;
     }
 
+
     /**
-     * verify if the given token is valid
+     * validates if requested amount matches the payment
+     * @param $requestedAmount string original amount requested for user to pay
      * @return bool
      */
-    public function isValidToken()
+    public function validateAmount(string $requestedAmount): bool
     {
-        if (!is_array($this->token) ||
-            !isset($this->token['id']) ||
-            !isset($this->token['orderID']) ||
-            !isset($this->token['requestAmount']) ||
-            !isset($this->token['netAmount']) ||
-            !isset($this->token['terminal'])
-        ) {
+        if (!is_numeric($requestedAmount)) {
+            return false;
+        }
+        // verify the amount
+        if (NumberFormatter::formatNumber($this->token['requestAmount']) != NumberFormatter::formatNumber($requestedAmount)) {
             return false;
         }
         return true;
@@ -54,28 +76,9 @@ class NotificationHandler
      * should be used to read the payment record client system
      * @return string
      */
-    public function getOrderID()
+    public function getOrderID(): string
     {
         return $this->token['orderID'];
-    }
-
-    /**
-     * validates if requested amount and terminal matches the payment
-     * @param $requestedAmount string original amount requested for user to pay
-     * @return bool
-     */
-    public function validatePayment($requestedAmount)
-    {
-        // verify the terminal
-        if ($this->token['terminal'] != $this->connection->getTerminalId()) {
-            return false;
-        }
-
-        // verify the amount
-        if (NumberFormatter::formatNumber($this->token['requestAmount']) != NumberFormatter::formatNumber($requestedAmount)) {
-            return false;
-        }
-        return true;
     }
 
 
@@ -83,7 +86,7 @@ class NotificationHandler
      * returns the amount requested
      * @return string
      */
-    public function getRequestedAmount()
+    public function getRequestedAmount(): string
     {
         return $this->token['requestAmount'];
     }
@@ -92,7 +95,7 @@ class NotificationHandler
      * returns the amount user actually paid
      * @return string
      */
-    public function getNetAmount()
+    public function getNetAmount(): string
     {
         return $this->token['netAmount'];
     }
@@ -101,7 +104,7 @@ class NotificationHandler
      * returns the FaizPay payment ID
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->token['id'];
     }
@@ -110,9 +113,8 @@ class NotificationHandler
      * returns the payment terminal ID
      * @return string
      */
-    public function getTerminal()
+    public function getTerminal(): string
     {
         return $this->token['terminal'];
     }
-
 }

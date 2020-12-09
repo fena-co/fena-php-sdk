@@ -15,26 +15,27 @@ final class Connection
     protected $terminalSecret;
 
     /**
-     * Connection constructor.
      * @param $terminalId string terminal id from faizpay portal
      * @param $terminalSecret string terminal secret from faizpay portal
-     * @throws \Exception
+     * @return Error|Connection
      */
-    public function __construct($terminalId, $terminalSecret)
+    public static function createConnection(string $terminalId, string $terminalSecret)
     {
-        if (!$this->validate($terminalId)) {
-            throw new \Exception('Invalid Terminal ID - Should be valid UUID4');
+        if (!self::validate($terminalId)) {
+            return new Error(Errors::CODE_1);
         }
 
-        if (!$this->validate($terminalSecret)) {
-            throw new \Exception('Invalid Terminal Secret - Should be valid UUID4');
+        if (!self::validate($terminalSecret)) {
+            return new Error(Errors::CODE_2);
         }
-
-        $this->terminalId = $terminalId;
-        $this->terminalSecret = $terminalSecret;
+        return new Connection($terminalId, $terminalSecret);
     }
 
-    protected function validate($uuid)
+    /**
+     * @param $uuid
+     * @return bool
+     */
+    private static function validate($uuid): bool
     {
         if (!is_string($uuid) || (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 1)) {
             return false;
@@ -42,10 +43,23 @@ final class Connection
         return true;
     }
 
+
+    /**
+     * Connection constructor.
+     * @param string $terminalId
+     * @param string $terminalSecret
+     */
+    private function __construct(string $terminalId, string $terminalSecret)
+    {
+        $this->terminalId = $terminalId;
+        $this->terminalSecret = $terminalSecret;
+    }
+
+
     /**
      * @return string
      */
-    public function getTerminalSecret()
+    public function getTerminalSecret(): string
     {
         return $this->terminalSecret;
     }
@@ -53,7 +67,7 @@ final class Connection
     /**
      * @return string
      */
-    public function getTerminalId()
+    public function getTerminalId(): string
     {
         return $this->terminalId;
     }

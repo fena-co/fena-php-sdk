@@ -16,25 +16,27 @@ class NewPayment
         $orderId = 'ABC';
         $amount = '10.00';
 
-        $connection = new Connection($terminalId, $terminalSecret);
+        $connection = Connection::createConnection($terminalId, $terminalSecret);
 
-        $payment = new Payment(
+        $payment = Payment::createPayment(
             $connection,
             $orderId,
             $amount
         );
 
-        $user = new User();
-        $user->setEmail("john.doe@test.com");
-        $user->setFirstName("John");
-        $user->setLastName("Doe");
-        $user->setContactNumber("07000845953");
+        $user = User::createUser(
+            $email = 'john.doe@test.com',
+            $firstName = 'John',
+            $lastName = 'Doe',
+            $contactNumber = '07000845953'
+        );
         $payment->setUser($user);
 
-        $provider = new Provider();
-        $provider->setProviderId('lloyds-bank');
-        $provider->setSortCode('123456');
-        $provider->setAccountNumber('12345678');
+        $provider = Provider::createProvider(
+            $providerId = 'lloyds-bank',
+            $sortCode = '123456',
+            $accountNumber = '12345678'
+        );
         $payment->setProvider($provider);
 
         $url = $payment->process($redirectBrowser = false);
