@@ -2,6 +2,12 @@ FaizPay PHP Payment SDK
 =======
 SDK for working with FaizPay payment APIs.
 
+
+Documentation
+------------
+Full documentation can be found at: https://documentation.faizpay.com
+
+
 Requirements
 ------------
 PHP 7.0.0 and later.
