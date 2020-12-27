@@ -106,7 +106,14 @@ class Payment
             'exp' => $currentUnixTimeStamp + $this->tokenExpiry,
             'terminalID' => $this->connection->getTerminalId(),
             'orderID' => $this->orderId,
-            'amount' => $this->amount
+            'amount' => $this->amount,
+            'email' => '',
+            'firstName' => '',
+            'lastName' => '',
+            'contactNumber' => '',
+            'bankID' => '',
+            'sortCode' => '',
+            'accountNumber' => ''
         ];
 
         if ($this->user instanceof User) {
