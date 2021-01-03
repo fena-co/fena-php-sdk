@@ -10,7 +10,7 @@ use Firebase\JWT\JWT;
 class Payment
 {
     private $alg = "HS512";
-    private $endpoint = 'https://faizpay-staging.netlify.app/pay?token=';
+    private $endpoint = 'https://app.faizpay.com/pay?token=';
     private $tokenExpiry = (60 * 120); // 2 hours
     protected $connection;
     protected $orderId;
