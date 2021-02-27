@@ -17,6 +17,8 @@ class Payment
     protected $amount;
     protected $user;
     protected $provider;
+    protected $items = [];
+    protected $deliveryAddress;
 
 
     /**
@@ -94,6 +96,28 @@ class Payment
     }
 
     /**
+     * add a new item to a order
+     * @param Item $item
+     * @return $this
+     */
+    public function addItem(Item $item): Payment
+    {
+        $this->items[] = $item->toArray();
+        return $this;
+    }
+
+    /**
+     * Set the optional delivery Address for payment
+     * @param DeliveryAddress|null $deliveryAddress
+     * @return $this
+     */
+    public function setDeliveryAddress(?DeliveryAddress $deliveryAddress): Payment
+    {
+        $this->deliveryAddress = $deliveryAddress;
+        return $this;
+    }
+
+    /**
      * process the payment
      * @param false $redirectBrowser
      * @return Error|string
@@ -113,7 +137,9 @@ class Payment
             'contactNumber' => '',
             'bankID' => '',
             'sortCode' => '',
-            'accountNumber' => ''
+            'accountNumber' => '',
+            'address' => '',
+            'items' => $this->items
         ];
 
         if ($this->user instanceof User) {
@@ -128,6 +154,19 @@ class Payment
             $payload['sortCode'] = (string)$this->provider->getSortCode();
             $payload['accountNumber'] = (string)$this->provider->getAccountNumber();
         }
+
+        if ($this->deliveryAddress instanceof DeliveryAddress) {
+            $payload['address'] =
+                [
+                    'line1' => (string)$this->deliveryAddress->getAddressLine1(),
+                    'line2' => (string)$this->deliveryAddress->getAddressLine2(),
+                    'postCode' => (string)$this->deliveryAddress->getPostCode(),
+                    'city' => (string)$this->deliveryAddress->getCity(),
+                    'country' => (string)$this->deliveryAddress->getCountry()
+                ];
+        }
+
+
         $jwt = JWT::encode($payload, $this->connection->getTerminalSecret(), $this->alg);
         $url = $this->endpoint . $jwt;
 
