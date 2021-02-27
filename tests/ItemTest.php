@@ -81,7 +81,7 @@ class ItemTest extends TestCase
 
     public function testGetQuantity()
     {
-        $item = Item::createItem('Cup', 1, '1.00');
+        $item = Item::createItem('Cup', 1, '2.00');
         $this->assertEquals(1, $item->getQuantity());
     }
 

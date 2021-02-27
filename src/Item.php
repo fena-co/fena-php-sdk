@@ -101,7 +101,7 @@ class Item
     {
         return [
             'name' => $this->getName(),
-            'quantity' => $this->getAmount(),
+            'quantity' => $this->getQuantity(),
             'amount' => $this->getAmount()
         ];
     }
