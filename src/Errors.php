@@ -23,8 +23,7 @@ class Errors
     public const CODE_18 = [18, 'Token terminal mismatch'];
     public const CODE_19 = [19, 'Item name need to be less than 255'];
     public const CODE_20 = [20, 'Item quantity need to be more than 1'];
-    public const CODE_21 = [21, 'Item Amount cannot be empty or less than 0.01'];
-    public const CODE_22 = [22, 'Item Amount must be 2 decimal places'];
+
     public const CODE_23 = [23, 'Delivery Address Line 1 cannot be empty or greater than 255 characters'];
     public const CODE_24 = [24, 'Delivery Address Line 2 cannot be greater than 255 characters'];
     public const CODE_25 = [25, 'Delivery Address Post Code cannot be empty or greater than 255 characters'];

@@ -2,8 +2,6 @@
 
 namespace FaizPay\PaymentSDK;
 
-use FaizPay\PaymentSDK\Helper\NumberFormatter;
-
 class Item
 {
     /**
@@ -17,19 +15,12 @@ class Item
     private $quantity;
 
     /**
-     * @var string
-     */
-    private $amount;
-
-    /**
      * @param string $name
      * @param int $quantity
-     * @param string $amount
      * @return Error|Item
      */
     public static function createItem(string $name,
-                                      int $quantity,
-                                      string $amount
+                                      int $quantity
     )
     {
         $name = trim($name);
@@ -43,30 +34,18 @@ class Item
         if ($quantity < 1) {
             return new Error(Errors::CODE_20);
         }
-
-        // validate amount
-        if ($amount == '' || $amount == '0.00' || (float)$amount < 0) {
-            return new Error(Errors::CODE_21);
-        }
-
-        // validate amount
-        if (!NumberFormatter::validateTwoDecimals($amount)) {
-            return new Error(Errors::CODE_22);
-        }
-        return new Item($name, $quantity, $amount);
+        return new Item($name, $quantity);
     }
 
     /**
      * Item constructor.
      * @param string $name
      * @param int $quantity
-     * @param string $amount
      */
-    private function __construct(string $name, int $quantity, string $amount)
+    private function __construct(string $name, int $quantity)
     {
         $this->name = $name;
         $this->quantity = $quantity;
-        $this->amount = $amount;
     }
 
     /**
@@ -85,15 +64,6 @@ class Item
         return $this->quantity;
     }
 
-
-    /**
-     * @return string
-     */
-    public function getAmount(): string
-    {
-        return $this->amount;
-    }
-
     /**
      * @return string[]
      */
@@ -102,7 +72,6 @@ class Item
         return [
             'name' => $this->getName(),
             'quantity' => $this->getQuantity(),
-            'amount' => $this->getAmount()
         ];
     }
 
