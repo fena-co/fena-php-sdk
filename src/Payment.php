@@ -55,14 +55,14 @@ class Payment
             return new Error(Errors::CODE_6);
         }
 
-        if($reference !== null) {
+        if ($reference !== null) {
             // reference number greater than 18
             if (strlen($reference) > 18) {
                 return new Error(Errors::CODE_28);
             }
         }
 
-        return new Payment($connection, $orderId, $amount);
+        return new Payment($connection, $orderId, $amount, $reference);
     }
 
     /**
@@ -70,16 +70,19 @@ class Payment
      * @param Connection $connection
      * @param $orderId string unique order id
      * @param $amount  string amount requested
+     * @param string|null $reference reference number for payment
      */
     private function __construct(
         Connection $connection,
         string     $orderId,
-        string     $amount
+        string     $amount,
+        ?string    $reference = null
     )
     {
         $this->connection = $connection;
         $this->orderId = $orderId;
         $this->amount = $amount;
+        $this->reference = $reference;
     }
 
 
