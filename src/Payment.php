@@ -1,8 +1,5 @@
 <?php
-
-
 namespace FaizPay\PaymentSDK;
-
 
 use FaizPay\PaymentSDK\Helper\NumberFormatter;
 use Firebase\JWT\JWT;
@@ -12,6 +9,7 @@ class Payment
     private $alg = "HS512";
     private $endpoint = 'https://app.faizpay.com/pay?token=';
     private $tokenExpiry = (60 * 120); // 2 hours
+
     protected $connection;
     protected $orderId;
     protected $amount;
@@ -19,6 +17,7 @@ class Payment
     protected $provider;
     protected $items = [];
     protected $deliveryAddress;
+    protected $reference = null;
 
 
     /**
@@ -29,8 +28,8 @@ class Payment
      */
     public static function createPayment(
         Connection $connection,
-        string $orderId,
-        string $amount
+        string     $orderId,
+        string     $amount
     )
     {
         $orderId = trim($orderId);
@@ -64,14 +63,24 @@ class Payment
      */
     private function __construct(
         Connection $connection,
-        string $orderId,
-        string $amount
+        string     $orderId,
+        string     $amount
     )
     {
         $this->connection = $connection;
         $this->orderId = $orderId;
         $this->amount = $amount;
     }
+
+    /**
+     * optional to set reference number for payment
+     * @param string|null $reference
+     */
+    public function setReference(?string $reference): void
+    {
+        $this->reference = $reference;
+    }
+
 
     /**
      * Set the optional user for payment
@@ -139,7 +148,8 @@ class Payment
             'sortCode' => '',
             'accountNumber' => '',
             'address' => '',
-            'items' => $this->items
+            'items' => $this->items,
+            'reference' => $this->reference
         ];
 
         if ($this->user instanceof User) {
