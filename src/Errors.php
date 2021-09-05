@@ -29,4 +29,6 @@ class Errors
     public const CODE_25 = [25, 'Delivery Address Post Code cannot be empty or greater than 255 characters'];
     public const CODE_26 = [26, 'Delivery Address City cannot be empty or greater than 255 characters'];
     public const CODE_27 = [27, 'Delivery Address Country must be 2 characters'];
+    public const CODE_28 = [28, 'Reference number cannot be greater than 18 characters'];
+
 }

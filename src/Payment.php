@@ -1,4 +1,5 @@
 <?php
+
 namespace FaizPay\PaymentSDK;
 
 use FaizPay\PaymentSDK\Helper\NumberFormatter;
@@ -24,12 +25,14 @@ class Payment
      * @param Connection $connection
      * @param string $orderId client order id
      * @param string $amount amount in 2 decimal places
+     * @param string|null $reference reference number for payment
      * @return Error|Payment
      */
     public static function createPayment(
         Connection $connection,
         string     $orderId,
-        string     $amount
+        string     $amount,
+        ?string    $reference = null
     )
     {
         $orderId = trim($orderId);
@@ -52,6 +55,13 @@ class Payment
             return new Error(Errors::CODE_6);
         }
 
+        if($reference !== null) {
+            // reference number greater than 18
+            if (strlen($reference) > 18) {
+                return new Error(Errors::CODE_28);
+            }
+        }
+
         return new Payment($connection, $orderId, $amount);
     }
 
@@ -70,15 +80,6 @@ class Payment
         $this->connection = $connection;
         $this->orderId = $orderId;
         $this->amount = $amount;
-    }
-
-    /**
-     * optional to set reference number for payment
-     * @param string|null $reference
-     */
-    public function setReference(?string $reference): void
-    {
-        $this->reference = $reference;
     }
 
 
