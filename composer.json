@@ -1,21 +1,21 @@
 {
-    "name": "faizpay/php-payment-sdk",
-    "description": "SDK for working with FaizPay payment APIs.",
+    "name": "fena/php-payment-sdk",
+    "description": "SDK for working with Fena payment APIs.",
     "type": "library",
     "authors": [
         {
-            "name": "FaizPay",
-            "email": "support@faizpay.com"
+            "name": "Fena",
+            "email": "support@fena.co"
         }
     ],
     "license": "MIT",
     "require": {
-        "firebase/php-jwt": "^5.2",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "autoload": {
         "psr-4": {
-            "FaizPay\\PaymentSDK\\": "src"
+            "Fena\\PaymentSDK\\": "src"
         }
     },
     "require-dev": {

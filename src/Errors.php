@@ -1,5 +1,5 @@
 <?php
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
 class Errors
 {
@@ -23,7 +23,8 @@ class Errors
     public const CODE_18 = [18, 'Token terminal mismatch'];
     public const CODE_19 = [19, 'Item name need to be less than 255'];
     public const CODE_20 = [20, 'Item quantity need to be more than 1'];
-
+    public const CODE_21 = [21, 'Missing or incorrect connection type'];
+    public const CODE_22 = [22, 'Server error'];
     public const CODE_23 = [23, 'Delivery Address Line 1 cannot be empty or greater than 255 characters'];
     public const CODE_24 = [24, 'Delivery Address Line 2 cannot be greater than 255 characters'];
     public const CODE_25 = [25, 'Delivery Address Post Code cannot be empty or greater than 255 characters'];

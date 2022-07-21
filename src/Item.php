@@ -1,6 +1,6 @@
 <?php
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
 class Item
 {

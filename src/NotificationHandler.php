@@ -1,46 +1,14 @@
 <?php
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
-use FaizPay\PaymentSDK\Helper\NumberFormatter;
-use Firebase\JWT\JWT;
+use Fena\PaymentSDK\Helper\NumberFormatter;
 
 class NotificationHandler
 {
-    private static $alg = "HS512";
+
     protected $connection;
     protected $token;
-
-    public static function createNotificationHandler(Connection $connection, $token)
-    {
-        try {
-            $token = JWT::decode($token, $connection->getTerminalSecret(), [self::$alg]);
-            if ($token instanceof \stdClass) {
-                $token = json_decode(json_encode($token), true);
-            }
-        } catch (\Exception $exception) {
-            return new Error(Errors::CODE_16);
-        }
-
-
-        // verify if token has field
-        if (!is_array($token) ||
-            !isset($token['id']) ||
-            !isset($token['orderID']) ||
-            !isset($token['requestAmount']) ||
-            !isset($token['netAmount']) ||
-            !isset($token['terminal'])
-        ) {
-            return new Error(Errors::CODE_17);
-        }
-
-        // validate the terminal
-        if ($token['terminal'] != $connection->getTerminalId()) {
-            return new Error(Errors::CODE_18);
-        }
-
-        return new NotificationHandler($connection, $token);
-    }
 
     /**
      * NotificationHandler constructor.

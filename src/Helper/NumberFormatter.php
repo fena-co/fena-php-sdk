@@ -1,6 +1,6 @@
 <?php
 
-namespace FaizPay\PaymentSDK\Helper;
+namespace Fena\PaymentSDK\Helper;
 
 class NumberFormatter
 {

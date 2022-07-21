@@ -1,34 +1,44 @@
 <?php
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
 final class Connection
 {
     /**
      * @var string
      */
-    protected $terminalId;
+    protected $connectionType;
 
     /**
      * @var string
      */
-    protected $terminalSecret;
+    protected $integrationId;
 
     /**
-     * @param $terminalId string terminal id from faizpay portal
-     * @param $terminalSecret string terminal secret from faizpay portal
+     * @var string
+     */
+    protected $integrationSecret;
+
+    /**
+     * @param $integrationId string Integration ID from Fena Business portal (for merchants) or partner API key ID (for partner type)
+     * @param $integrationSecret string terminal secret from faizpay portal
+     * @param $connectionType string Connection type ('merchant' or 'partner')
      * @return Error|Connection
      */
-    public static function createConnection(string $terminalId, string $terminalSecret)
+    public static function createConnection(string $integrationId, string $integrationSecret, string $connectionType = 'merchant')
     {
-        if (!self::validate($terminalId)) {
+        if (!self::validate($integrationId)) {
             return new Error(Errors::CODE_1);
         }
 
-        if (!self::validate($terminalSecret)) {
+        if (!self::validate($integrationSecret)) {
             return new Error(Errors::CODE_2);
         }
-        return new Connection($terminalId, $terminalSecret);
+
+        if (!self::validate($connectionType)) {
+            return new Error(Errors::CODE_21);
+        }
+        return new Connection($integrationId, $integrationSecret, $connectionType);
     }
 
     /**
@@ -37,7 +47,7 @@ final class Connection
      */
     private static function validate($uuid): bool
     {
-        if (!is_string($uuid) || (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 1)) {
+        if (!is_string($uuid)) {
             return false;
         }
         return true;
@@ -48,27 +58,37 @@ final class Connection
      * Connection constructor.
      * @param string $terminalId
      * @param string $terminalSecret
+     * @param string $connectionType
      */
-    private function __construct(string $terminalId, string $terminalSecret)
+    private function __construct(string $integrationId, string $integrationSecret, string $connectionType)
     {
-        $this->terminalId = $terminalId;
-        $this->terminalSecret = $terminalSecret;
+        $this->integrationId = $integrationId;
+        $this->integrationSecret = $integrationSecret;
+        $this->connectionType = $connectionType;
     }
 
 
     /**
      * @return string
      */
-    public function getTerminalSecret(): string
+    public function getIntegrationSecret(): string
     {
-        return $this->terminalSecret;
+        return $this->integrationSecret;
     }
 
     /**
      * @return string
      */
-    public function getTerminalId(): string
+    public function getIntegrationId(): string
     {
-        return $this->terminalId;
+        return $this->integrationId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConnectionType(): string
+    {
+        return $this->connectionType;
     }
 }

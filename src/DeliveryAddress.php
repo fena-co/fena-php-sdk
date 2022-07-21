@@ -1,6 +1,6 @@
 <?php
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
 class DeliveryAddress
 {
@@ -17,7 +17,7 @@ class DeliveryAddress
     /**
      * @var string
      */
-    private $postCode;
+    private $zipCode;
 
     /**
      * @var string
@@ -100,7 +100,7 @@ class DeliveryAddress
     {
         $this->addressLine1 = $addressLine1;
         $this->addressLine2 = $addressLine2;
-        $this->postCode = $postCode;
+        $this->zipCode = $postCode;
         $this->city = $city;
         $this->country = $country;
     }
@@ -126,7 +126,7 @@ class DeliveryAddress
      */
     public function getPostCode(): string
     {
-        return $this->postCode;
+        return $this->zipCode;
     }
 
 

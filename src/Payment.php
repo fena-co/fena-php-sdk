@@ -1,17 +1,14 @@
 <?php
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
-use FaizPay\PaymentSDK\Helper\NumberFormatter;
-use Firebase\JWT\JWT;
+use Fena\PaymentSDK\Helper\NumberFormatter;
 
 class Payment
 {
-    private $alg = "HS512";
-    private $endpoint = 'https://app.faizpay.com/pay?token=';
-    private $tokenExpiry = (60 * 120); // 2 hours
+    private $endpoint = 'https://business.api.fena.co/public/payments/create-and-process';
 
-    protected $connection;
+    protected $refNumber;
     protected $orderId;
     protected $amount;
     protected $user;
@@ -30,16 +27,10 @@ class Payment
      */
     public static function createPayment(
         Connection $connection,
-        string     $orderId,
         string     $amount,
-        ?string    $reference = null
+        string    $reference
     )
     {
-        $orderId = trim($orderId);
-        // validate order Id
-        if ($orderId == '') {
-            return new Error(Errors::CODE_3);
-        }
         // validate amount
         if ($amount == '' || $amount == '0.00' || (float)$amount < 0) {
             return new Error(Errors::CODE_4);
@@ -51,18 +42,11 @@ class Payment
         }
 
         // validate order is greater than 255
-        if (strlen($orderId) > 255) {
+        if (strlen($reference) > 255) {
             return new Error(Errors::CODE_6);
         }
 
-        if ($reference !== null) {
-            // reference number greater than 18
-            if (strlen($reference) > 18) {
-                return new Error(Errors::CODE_28);
-            }
-        }
-
-        return new Payment($connection, $orderId, $amount, $reference);
+        return new Payment($connection, $amount, $reference);
     }
 
     /**
@@ -132,62 +116,60 @@ class Payment
 
     /**
      * process the payment
-     * @param false $redirectBrowser
      * @return Error|string
      */
-    public function process($redirectBrowser = false)
+    public function process()
     {
-        $currentUnixTimeStamp = time();
+        $curl = curl_init();
         $payload = [
-            'iat' => $currentUnixTimeStamp,
-            'exp' => $currentUnixTimeStamp + $this->tokenExpiry,
-            'terminalID' => $this->connection->getTerminalId(),
-            'orderID' => $this->orderId,
+            'invoiceRefNumber' => $this->refNumber,
             'amount' => $this->amount,
-            'email' => '',
-            'firstName' => '',
-            'lastName' => '',
-            'contactNumber' => '',
-            'bankID' => '',
-            'sortCode' => '',
-            'accountNumber' => '',
-            'address' => '',
+            'customerEmail' => '',
+            'customerName' => '',
             'items' => $this->items,
-            'reference' => $this->reference
         ];
 
         if ($this->user instanceof User) {
-            $payload['email'] = (string)$this->user->getEmail();
-            $payload['firstName'] = (string)$this->user->getFirstName();
-            $payload['lastName'] = (string)$this->user->getLastName();
-            $payload['contactNumber'] = (string)$this->user->getContactNumber();
-        }
-
-        if ($this->provider instanceof Provider) {
-            $payload['bankID'] = (string)$this->provider->getProviderId();
-            $payload['sortCode'] = (string)$this->provider->getSortCode();
-            $payload['accountNumber'] = (string)$this->provider->getAccountNumber();
+            $payload['customerEmail'] = (string)$this->user->getEmail();
+            $payload['customerName'] = $this->user->getFirstName() . ' ' . $this->user->getLastName();
         }
 
         if ($this->deliveryAddress instanceof DeliveryAddress) {
-            $payload['address'] =
+            $payload['deliveryAddress'] =
                 [
-                    'line1' => (string)$this->deliveryAddress->getAddressLine1(),
-                    'line2' => (string)$this->deliveryAddress->getAddressLine2(),
-                    'postCode' => (string)$this->deliveryAddress->getPostCode(),
+                    'addressLine1' => (string)$this->deliveryAddress->getAddressLine1(),
+                    'addressLine2' => (string)$this->deliveryAddress->getAddressLine2(),
+                    'zipCode' => (string)$this->deliveryAddress->getPostCode(),
                     'city' => (string)$this->deliveryAddress->getCity(),
                     'country' => (string)$this->deliveryAddress->getCountry()
                 ];
         }
 
+        $integrationId = $this->connection->getIntegrationId();
+        $integrationSecret = $this->connection->getIntegrationSecret();
+        $headers = ['Content-Type: application/json', 'secret_key: ' . $integrationSecret, 'integration_id: ' . $integrationId];
 
-        $jwt = JWT::encode($payload, $this->connection->getTerminalSecret(), $this->alg);
-        $url = $this->endpoint . $jwt;
+        curl_setopt($curl, CURLOPT_URL, $this->endpoint);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_HEADER, $headers);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
 
-        if ($redirectBrowser) {
-            header("Location: {$jwt}");
-            die();
+        $response = curl_exec($curl);
+
+        if($e = curl_error($curl)) {
+            return new Error(Errors::CODE_22);
+        } else {
+
+            // Decoding JSON data
+            $decodedData =
+                json_decode($response, true);
+
+            if ($decodedData['created'] === true) {
+                return $decodedData['result']['link'];
+            } else {
+                return new Error(Errors::CODE_22);
+            }
         }
-        return $url;
     }
 }

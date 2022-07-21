@@ -1,7 +1,7 @@
 <?php
 
 
-namespace FaizPay\PaymentSDK;
+namespace Fena\PaymentSDK;
 
 
 class Error
