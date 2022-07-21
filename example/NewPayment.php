@@ -1,10 +1,10 @@
 <?php
 
 
-use FaizPay\PaymentSDK\Connection;
-use FaizPay\PaymentSDK\Payment;
-use FaizPay\PaymentSDK\Provider;
-use FaizPay\PaymentSDK\User;
+use Fena\PaymentSDK\Connection;
+use Fena\PaymentSDK\Payment;
+use Fena\PaymentSDK\Provider;
+use Fena\PaymentSDK\User;
 
 class NewPayment
 {
