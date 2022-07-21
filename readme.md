@@ -38,67 +38,36 @@ Getting Started
 Simple new payment looks like:
 
 ```php
-use FaizPay\PaymentSDK\Connection;
-use FaizPay\PaymentSDK\Payment;
+use Fena\PaymentSDK\Connection;
+use Fena\PaymentSDK\Payment;
 
 $connection = Connection::createConnection(
-    $terminalId = '8afa74ae-6ef9-48bb-93b2-9fe8be53db50',
-    $terminalSecret = '55d7d5ed-be22-4321-bb3f-aec8524d8be2'
+    $integrationId = '8afa74ae-6ef9-48bb-93b2-9fe8be53db50',
+    $integrationSecret = '55d7d5ed-be22-4321-bb3f-aec8524d8be2'
 );
 
 $payment = Payment::createPayment(
     $connection,
-    $orderId = 'AA-11', 
     $amount = '10.00'
+    $reference = 'AA-11', 
 );
  
 $payment->process();
 ```
 
-__Webhook / Notification Handling__
-
-```php
-use FaizPay\PaymentSDK\Connection;
-use FaizPay\PaymentSDK\NotificationHandler;
-
-$connection = Connection::createConnection($terminalId, $terminalSecret);
-$notificationHandler = NotificationHandler::createNotificationHandler($connection, $token = $_POST['token']);
-
-// extract the order id
-$orderId = $notificationHandler->getOrderID();
-
-// fetch the order from your database
-$data = findFromDatabase($orderId);
-
-// if order is not found in system
-if (checkIfEntryFound($data)) {
-    echo "Invalid Token";
-    die();
-}
-
-// validate if the requested payment matches with token
-if (!$notificationHandler->validateAmount($data['amount'])) {
-    echo "Invalid Token";
-    die();
-}
-
-// all checks are passed - update the database to mark payment complete
-updateDatabase($orderId, ['completed' => true]);
-```
-
 __Optional: Set User or Pre Selected Provider For New Payment__
 
 ```php
-use FaizPay\PaymentSDK\Connection;
-use FaizPay\PaymentSDK\Payment;
-use FaizPay\PaymentSDK\Provider;
-use FaizPay\PaymentSDK\User;
+use Fena\PaymentSDK\Connection;
+use Fena\PaymentSDK\Payment;
+use Fena\PaymentSDK\Provider;
+use Fena\PaymentSDK\User;
 
 $connection = Connection::createConnection($terminalId, $terminalSecret);
 $payment = Payment::createPayment(
     $connection,
-    $orderId = 'AA-11', 
-    $amount = '10.00'
+    $amount = '10.00',
+    $reference = 'AA-11', 
 );
 
 $user = User::createUser(
