@@ -1,11 +1,11 @@
-FaizPay PHP Payment SDK
+Fena PHP Payment SDK
 =======
-SDK for working with FaizPay payment APIs.
+SDK for working with Fena payment APIs.
 
 
 Documentation
 ------------
-Full documentation can be found at: https://documentation.faizpay.com
+Full documentation can be found at: https://docs.fena.co
 
 
 Requirements
@@ -18,7 +18,7 @@ Installation
 You can install the bindings via Composer. Run the following command:
 
 ```bash
-composer require faizpay/php-payment-sdk
+composer require fena/php-payment-sdk
 ```
 
 To use the bindings, use Composer's autoload:
