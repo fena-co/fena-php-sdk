@@ -42,7 +42,7 @@ use Fena\PaymentSDK\Connection;
 use Fena\PaymentSDK\Payment;
 
 $connection = Connection::createConnection(
-    $integrationId = '8afa74ae-6ef9-48bb-93b2-9fe8be53db50',
+    $integrationId = '8afa74ae9fe8be53db50',
     $integrationSecret = '55d7d5ed-be22-4321-bb3f-aec8524d8be2'
 );
 
