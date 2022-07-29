@@ -9,26 +9,23 @@ class Payment
     private $endpoint = 'https://business.api.fena.co/public/payments/create-and-process';
 
     protected $refNumber;
-    protected $orderId;
     protected $amount;
     protected $user;
     protected $provider;
     protected $items = [];
     protected $deliveryAddress;
-    protected $reference = null;
 
 
     /**
      * @param Connection $connection
-     * @param string $orderId client order id
      * @param string $amount amount in 2 decimal places
-     * @param string|null $reference reference number for payment
+     * @param string $reference reference number for payment
      * @return Error|Payment
      */
     public static function createPayment(
         Connection $connection,
         string     $amount,
-        string    $reference
+        string     $reference
     )
     {
         // validate amount
@@ -42,8 +39,13 @@ class Payment
         }
 
         // validate order is greater than 255
-        if (strlen($reference) > 255) {
+
+        if (strlen($reference) > 18) {
             return new Error(Errors::CODE_6);
+        }
+
+        if (!self::validateReference($reference)) {
+            return new Error(Errors::CODE_28);
         }
 
         return new Payment($connection, $amount, $reference);
@@ -52,21 +54,18 @@ class Payment
     /**
      * Payment constructor.
      * @param Connection $connection
-     * @param $orderId string unique order id
      * @param $amount  string amount requested
-     * @param string|null $reference reference number for payment
+     * @param $orderId string reference number for payment
      */
     private function __construct(
         Connection $connection,
         string     $orderId,
-        string     $amount,
-        ?string    $reference = null
+        string     $amount
     )
     {
         $this->connection = $connection;
-        $this->orderId = $orderId;
+        $this->refNumber = $orderId;
         $this->amount = $amount;
-        $this->reference = $reference;
     }
 
 
@@ -115,6 +114,18 @@ class Payment
     }
 
     /**
+     * @param $reference
+     * @return bool
+     */
+    private static function validateReference($reference): bool
+    {
+        if (!is_string($reference) || (preg_match('/^[\w-]+$/', $reference) !== 1)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * process the payment
      * @return Error|string
      */
@@ -137,11 +148,11 @@ class Payment
         if ($this->deliveryAddress instanceof DeliveryAddress) {
             $payload['deliveryAddress'] =
                 [
-                    'addressLine1' => (string)$this->deliveryAddress->getAddressLine1(),
-                    'addressLine2' => (string)$this->deliveryAddress->getAddressLine2(),
-                    'zipCode' => (string)$this->deliveryAddress->getPostCode(),
-                    'city' => (string)$this->deliveryAddress->getCity(),
-                    'country' => (string)$this->deliveryAddress->getCountry()
+                    'addressLine1' => $this->deliveryAddress->getAddressLine1(),
+                    'addressLine2' => $this->deliveryAddress->getAddressLine2(),
+                    'zipCode' => $this->deliveryAddress->getPostCode(),
+                    'city' => $this->deliveryAddress->getCity(),
+                    'country' => $this->deliveryAddress->getCountry()
                 ];
         }
 

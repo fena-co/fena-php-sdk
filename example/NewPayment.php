@@ -11,7 +11,7 @@ class NewPayment
 
     public function createNewPayment()
     {
-        $terminalId = '8afa74ae-6ef9-48bb-93b2-9fe8be53db50';
+        $terminalId = '8afa74ae93b29fe8be53db50';
         $terminalSecret = '55d7d5ed-be22-4321-bb3f-aec8524d8be2';
         $orderId = 'ABC';
         $amount = '10.00';
@@ -20,8 +20,8 @@ class NewPayment
 
         $payment = Payment::createPayment(
             $connection,
-            $orderId,
-            $amount
+            $amount,
+            $orderId
         );
 
         $user = User::createUser(
@@ -39,7 +39,7 @@ class NewPayment
         );
         $payment->setProvider($provider);
 
-        $url = $payment->process($redirectBrowser = false);
+        $url = $payment->process();
     }
 
 

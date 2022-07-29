@@ -8,7 +8,7 @@ class Errors
     public const CODE_3 = [3, 'Order ID cannot be empty'];
     public const CODE_4 = [4, 'Amount cannot be empty or less than 0.01'];
     public const CODE_5 = [5, 'Number must be 2 decimal places'];
-    public const CODE_6 = [6, 'Order ID cannot be greater than 255 characters'];
+    public const CODE_6 = [6, 'Reference cannot be greater than 18 characters'];
     public const CODE_7 = [7, 'Invalid Sort Code'];
     public const CODE_8 = [8, 'Invalid Account Number'];
     public const CODE_9 = [9, 'Provider ID must be set to set sort code and account number'];
@@ -30,6 +30,6 @@ class Errors
     public const CODE_25 = [25, 'Delivery Address Post Code cannot be empty or greater than 255 characters'];
     public const CODE_26 = [26, 'Delivery Address City cannot be empty or greater than 255 characters'];
     public const CODE_27 = [27, 'Delivery Address Country must be 2 characters'];
-    public const CODE_28 = [28, 'Reference number cannot be greater than 18 characters'];
+    public const CODE_28 = [28, 'Reference must contain only letters, numbers and dashes'];
 
 }

@@ -56,8 +56,8 @@ final class Connection
 
     /**
      * Connection constructor.
-     * @param string $terminalId
-     * @param string $terminalSecret
+     * @param string $integrationId
+     * @param string $integrationSecret
      * @param string $connectionType
      */
     private function __construct(string $integrationId, string $integrationSecret, string $connectionType)
