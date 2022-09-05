@@ -6,8 +6,8 @@ use Fena\PaymentSDK\Helper\NumberFormatter;
 
 class Payment
 {
-    private $endpoint = 'https://business.api.fena.co/public/payments/create-and-process';
-    private $checkEndpoint = 'https://business.api.fena.co/payment-flow/public/payment/';
+    private $endpoint = 'https://business.api.staging.fena.co/public/payments/create-and-process';
+    private $checkEndpoint = 'https://business.api.staging.fena.co/payment-flow/public/payment/';
 
     protected $refNumber;
     protected $orderId;
@@ -184,6 +184,8 @@ class Payment
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
+        $response = curl_exec($curl);
+
         if($e = curl_error($curl)) {
             return new Error(Errors::CODE_22);
         } else {
@@ -199,5 +201,35 @@ class Payment
                 return new Error(Errors::CODE_22);
             }
         }
+    }
+
+    public function checkStatusByHashedId(string $hashed) {
+            $curl = curl_init();
+            $headers = array('Content-Type: application/json');
+            curl_setopt($curl, CURLOPT_URL, $this->checkEndpoint . $hashed);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+            $response = curl_exec($curl);
+
+            if($e = curl_error($curl)) {
+                return new Error(Errors::CODE_22);
+            } else {
+
+                // Decoding JSON data
+                $decodedData =
+                    json_decode($response, true);
+
+
+                if ($decodedData) {
+                    return $decodedData;
+                } else {
+                    return new Error(Errors::CODE_22);
+                }
+            }
+        }
+
+    public function getHashedId() {
+        return $this->hashedId;
     }
 }
