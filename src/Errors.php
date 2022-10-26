@@ -8,7 +8,7 @@ class Errors
     public const CODE_3 = [3, 'Order ID cannot be empty'];
     public const CODE_4 = [4, 'Amount cannot be empty or less than 0.01'];
     public const CODE_5 = [5, 'Number must be 2 decimal places'];
-    public const CODE_6 = [6, 'Reference cannot be greater than 18 characters'];
+    public const CODE_6 = [6, 'Reference cannot be greater than 12 characters'];
     public const CODE_7 = [7, 'Invalid Sort Code'];
     public const CODE_8 = [8, 'Invalid Account Number'];
     public const CODE_9 = [9, 'Provider ID must be set to set sort code and account number'];

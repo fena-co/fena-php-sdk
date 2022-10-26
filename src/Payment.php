@@ -44,7 +44,7 @@ class Payment
         }
 
         // validate order id is greater than 18
-        if (strlen($reference) > 18) {
+        if (strlen($reference) > 12) {
             return new Error(Errors::CODE_6);
         }
 
