@@ -18,6 +18,7 @@ class Payment
     protected $deliveryAddress;
     protected $reference = null;
     protected $hashedId;
+    protected $customRedirectURL;
 
 
     /**
@@ -25,12 +26,14 @@ class Payment
      * @param string $orderId client order id
      * @param string $amount amount in 2 decimal places
      * @param string|null $reference reference number for payment
+     * @param string|null $customRedirectUrl custom redirect URL for the current payment
      * @return Error|Payment
      */
     public static function createPayment(
         Connection $connection,
         string     $amount,
-        string     $reference
+        string     $reference,
+        string     $customRedirectURL
     )
     {
         // validate amount
@@ -57,16 +60,19 @@ class Payment
      * @param $orderId string unique order id
      * @param $amount  string amount requested
      * @param string|null $reference reference number for payment
+     * @param string|null $customRedirectURL custom redirect URL for the current payment
      */
     private function __construct(
             Connection $connection,
             string     $orderId,
-            string     $amount
+            string     $amount,
+            string     $customRedirectURL
         )
         {
             $this->connection = $connection;
             $this->refNumber = $orderId;
             $this->amount = $amount;
+            $this->customRedirectURL = $customRedirectURL;
         }
 
 
@@ -127,6 +133,7 @@ class Payment
             'customerEmail' => '',
             'customerName' => '',
             'items' => $this->items,
+            'customRedirectUrl' => $this->customRedirectURL,
         ];
 
         if ($this->user instanceof User) {
