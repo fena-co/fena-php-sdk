@@ -18,22 +18,21 @@ class Payment
     protected $deliveryAddress;
     protected $reference = null;
     protected $hashedId;
-    protected $customRedirectURL;
+    protected $customRedirectURL = null;
 
 
     /**
      * @param Connection $connection
      * @param string $orderId client order id
      * @param string $amount amount in 2 decimal places
-     * @param string|null $reference reference number for payment
      * @param string|null $customRedirectUrl custom redirect URL for the current payment
      * @return Error|Payment
      */
     public static function createPayment(
-        Connection $connection,
-        string     $amount,
-        string     $reference,
-        string     $customRedirectURL
+        Connection  $connection,
+        string      $amount,
+        string      $reference,
+        ?string     $customRedirectURL = null
     )
     {
         // validate amount
@@ -41,17 +40,17 @@ class Payment
             return new Error(Errors::CODE_4);
         }
 
-        // validate amount
+// validate amount
         if (!NumberFormatter::validateTwoDecimals($amount)) {
             return new Error(Errors::CODE_5);
         }
 
-        // validate order id is greater than 18
+// validate order id is greater than 18
         if (strlen($reference) > 12) {
             return new Error(Errors::CODE_6);
         }
 
-        return new Payment($connection, $reference, $amount);
+        return new Payment($connection, $reference, $amount, $customRedirectURL);
     }
 
     /**
@@ -59,21 +58,22 @@ class Payment
      * @param Connection $connection
      * @param $orderId string unique order id
      * @param $amount  string amount requested
-     * @param string|null $reference reference number for payment
-     * @param string|null $customRedirectURL custom redirect URL for the current payment
+     * @param ?string $customRedirectURL custom redirect URL for the current payment
      */
     private function __construct(
-            Connection $connection,
-            string     $orderId,
-            string     $amount,
-            string     $customRedirectURL
-        )
-        {
-            $this->connection = $connection;
-            $this->refNumber = $orderId;
-            $this->amount = $amount;
+        Connection  $connection,
+        string      $orderId,
+        string      $amount,
+        ?string     $customRedirectURL = null
+    )
+    {
+        $this->connection = $connection;
+        $this->refNumber = $orderId;
+        $this->amount = $amount;
+        if (!is_null($customRedirectURL)) {
             $this->customRedirectURL = $customRedirectURL;
         }
+    }
 
 
     /**
@@ -133,8 +133,11 @@ class Payment
             'customerEmail' => '',
             'customerName' => '',
             'items' => $this->items,
-            'customRedirectUrl' => $this->customRedirectURL,
         ];
+
+        if (!is_null($this->customRedirectURL)) {
+            $payload['customRedirectUrl'] = $this->customRedirectURL;
+        }
 
         if ($this->user instanceof User) {
             $payload['customerEmail'] = (string)$this->user->getEmail();
@@ -164,7 +167,7 @@ class Payment
 
         $response = curl_exec($curl);
 
-        if($e = curl_error($curl)) {
+        if ($e = curl_error($curl)) {
             return new Error(Errors::CODE_22);
         } else {
 
@@ -175,7 +178,7 @@ class Payment
 
             if ($decodedData['created'] === true) {
                 $link = $decodedData['result']['link'];
-                $pos = strpos($link,"=");
+                $pos = strpos($link, "=");
                 $this->hashedId = substr($link, $pos + 1);
                 return $decodedData['result']['link'];
             } else {
@@ -184,7 +187,8 @@ class Payment
         }
     }
 
-    public function manuallyCheckStatus() {
+    public function manuallyCheckStatus()
+    {
         $curl = curl_init();
         $headers = array('Content-Type: application/json');
         curl_setopt($curl, CURLOPT_URL, $this->checkEndpoint . $this->hashedId);
@@ -193,7 +197,7 @@ class Payment
 
         $response = curl_exec($curl);
 
-        if($e = curl_error($curl)) {
+        if ($e = curl_error($curl)) {
             return new Error(Errors::CODE_22);
         } else {
 
@@ -210,33 +214,35 @@ class Payment
         }
     }
 
-    public function checkStatusByHashedId(string $hashed) {
-            $curl = curl_init();
-            $headers = array('Content-Type: application/json');
-            curl_setopt($curl, CURLOPT_URL, $this->checkEndpoint . $hashed);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    public function checkStatusByHashedId(string $hashed)
+    {
+        $curl = curl_init();
+        $headers = array('Content-Type: application/json');
+        curl_setopt($curl, CURLOPT_URL, $this->checkEndpoint . $hashed);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-            $response = curl_exec($curl);
+        $response = curl_exec($curl);
 
-            if($e = curl_error($curl)) {
-                return new Error(Errors::CODE_22);
+        if ($e = curl_error($curl)) {
+            return new Error(Errors::CODE_22);
+        } else {
+
+            // Decoding JSON data
+            $decodedData =
+                json_decode($response, true);
+
+
+            if ($decodedData) {
+                return $decodedData;
             } else {
-
-                // Decoding JSON data
-                $decodedData =
-                    json_decode($response, true);
-
-
-                if ($decodedData) {
-                    return $decodedData;
-                } else {
-                    return new Error(Errors::CODE_22);
-                }
+                return new Error(Errors::CODE_22);
             }
         }
+    }
 
-    public function getHashedId() {
+    public function getHashedId()
+    {
         return $this->hashedId;
     }
 }
